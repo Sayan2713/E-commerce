@@ -1,0 +1,15 @@
+node_modules/
+.env
+*.log
+dist/
+build/
+admin-backend/invoices/
+admin-backend/.env
+admin-frontend/.env
+frontend/.env
+backend/.env
+moblie/.env
+mobile/.env.example
+mobile/.gitignore
+README.md
+PLAY_STORE_CHECKLIST.md
