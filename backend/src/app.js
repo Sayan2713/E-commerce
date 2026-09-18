@@ -44,7 +44,7 @@ if (isProduction && (!corsOrigins || corsOrigins.length === 0)) {
   throw new Error('CORS_ORIGIN must be set to your production frontend URL(s) when NODE_ENV=production');
 }
 app.use(cors({
-  origin: isProduction ? corsOrigins : (corsOrigins?.length ? corsOrigins : '*'),
+  origin: isProduction ? corsOrigins : (corsOrigins?.length ? corsOrigins : "https://e-commerce-s56x.vercel.app"),
   credentials: true,
 }));
 
