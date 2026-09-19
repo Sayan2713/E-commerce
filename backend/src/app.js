@@ -43,9 +43,22 @@ const corsOrigins = process.env.CORS_ORIGIN?.split(',').map((o) => o.trim()).fil
 if (isProduction && (!corsOrigins || corsOrigins.length === 0)) {
   throw new Error('CORS_ORIGIN must be set to your production frontend URL(s) when NODE_ENV=production');
 }
+const resolvedOrigin = isProduction ? corsOrigins : (corsOrigins?.length ? corsOrigins : '*');
+// The `cors` package only treats "*" as a wildcard when passed as the raw
+// string '*' - an array containing "*" (which is what CORS_ORIGIN=* becomes
+// after .split(',')) makes it do a literal string match against the real
+// request Origin header, which never equals the text "*", so it silently
+// matches nothing and sends no CORS header at all. Detect that case and
+// pass the raw string instead.
+const isWildcard = Array.isArray(resolvedOrigin)
+  ? resolvedOrigin.length === 1 && resolvedOrigin[0] === '*'
+  : resolvedOrigin === '*';
 app.use(cors({
-  origin: isProduction ? corsOrigins : (corsOrigins?.length ? corsOrigins : "https://e-commerce-s56x.vercel.app"),
-  credentials: true,
+  origin: isWildcard ? '*' : resolvedOrigin,
+  // Access-Control-Allow-Origin: * combined with Access-Control-Allow-Credentials: true
+  // is an invalid combination per the CORS spec - only send credentials:true
+  // when we're not wildcarding.
+  credentials: !isWildcard,
 }));
 
 app.use(express.json({ limit: '2mb' }));
